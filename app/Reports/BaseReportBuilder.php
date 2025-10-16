@@ -3,9 +3,7 @@
 namespace App\Reports;
 
 use App\Exceptions\ValidationException;
-use App\Reports\Criteria\Criteria;
-use App\Validators\Reports\ReportBuilderValidator;
-use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
@@ -212,7 +210,7 @@ abstract class BaseReportBuilder
         );
     }
 
-    private function getItemsKeys(): array
+    protected function getItemsKeys(): array
     {
         return array_merge(
             $this->attributes,

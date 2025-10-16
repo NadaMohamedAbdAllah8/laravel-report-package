@@ -8,22 +8,23 @@ use Illuminate\Support\Facades\Log;
 
 class PaginatedReportBuilder extends BaseReportBuilder
 {
-    private ?int $paginate = null;
-    private int $page = 1;
+    const CACHE_PREFIX = 'count_';
+    const CACHE_TIME_IN_MINUTES = 30;
+
+    const DEFAULT_PER_PAGE = 15;
+    const DEFAULT_PAGE = 1;
+
+    private int $perPage;
+    private int $page = self::DEFAULT_PAGE;
     private array $pagination = [];
 
     /**
      * Set the number of items per page for pagination.
      */
-    public function paginate(?int $perPage = null, ?int $page = 1): self
+    public function paginate(int $perPage, ?int $page = self::DEFAULT_PAGE): self
     {
-        Log::info('[PaginatedReportBuilder] Setting pagination parameters', [
-            'per_page' => $perPage,
-            'page' => $page,
-        ]);
-
-        $this->paginate = $perPage;
-        $this->page = $page ?? 1;
+        $this->perPage = $perPage;
+        $this->page = $page;
 
         return $this;
     }
@@ -33,68 +34,42 @@ class PaginatedReportBuilder extends BaseReportBuilder
      */
     public function get(): Collection
     {
-        Log::info('[PaginatedReportBuilder@get] Retrieving report data');
+        Log::info('[ReportBuilder@get] Retrieving report data');
 
         $collection = parent::get();
 
-        if (!is_null($this->paginate)) {
-            Log::debug('[PaginatedReportBuilder@get] Adding pagination metadata', [
-                'pagination' => $this->pagination,
-            ]);
-            $collection['pagination'] = $this->pagination;
-        }
+        $collection['pagination'] = $this->pagination;
 
         return $collection;
     }
 
-    /**
-     * Builds the report attributes.
-     * If pagination is enabled, applies pagination before building attributes.
-     */
-    protected function buildAttributes(): BaseReportBuilder
-    {
-        if (is_null($this->paginate)) {
-            Log::debug('[PaginatedReportBuilder] Pagination is disabled, using parent attributes');
-            return parent::buildAttributes();
-        }
-
-        return $this->applyPagination();
-    }
 
     /**
      * Applies pagination to the query and stores pagination metadata.
      */
-    private function applyPagination(): BaseReportBuilder
+    private function buildPaginatedAttributes(): BaseReportBuilder
     {
         $totalSizeQuery = clone $this->query;
 
         $sqlQuery = $totalSizeQuery->toSql();
         $queryBindings = $totalSizeQuery->getBindings();
-        $cacheKey = 'count_' . md5($sqlQuery . json_encode($queryBindings));
+        $cacheKey = self::CACHE_PREFIX . md5($sqlQuery . json_encode($queryBindings));
 
-        if (Cache::has($cacheKey)) {
-            Log::debug('[PaginatedReportBuilder] Count key is cached', [
-                'cached_key' => $cacheKey,
-            ]);
-        } else {
-            Log::debug('[PaginatedReportBuilder] Count key is not cached', [
-                'cached_key' => $cacheKey,
-            ]);
-        }
-
-        $totalSize = Cache::remember($cacheKey, now()->addMinutes(30), function () use ($totalSizeQuery) {
+        $totalSize = Cache::remember(
+            $cacheKey,
+            now()->addMinutes(self::CACHE_TIME_IN_MINUTES),
+            function () use ($totalSizeQuery): int {
             return $totalSizeQuery->count('id');
         });
 
-        $perPage = $this->paginate ?? 15;
-        $totalPages = (int) ceil(($totalSize ?: 0) / max($perPage, 1));
+        $totalPages = (int) ceil(($totalSize ?: 0) / max($this->perPage, 1));
 
         $paginator = $this->query->simplePaginate(
-            perPage: $perPage,
+            perPage: $this->perPage,
             page: $this->page
         );
 
-        Log::info('[PaginatedReportBuilder] Query after applying pagination', [
+        Log::info('[ReportBuilder] Query after applying pagination', [
             'sql' => $this->query->toSql(),
             'queryBindings' => $this->query->getBindings(),
         ]);
@@ -118,7 +93,7 @@ class PaginatedReportBuilder extends BaseReportBuilder
     public function build(): BaseReportBuilder
     {
         $this->applyCriteria();
-        $this->buildAttributes();
+        $this->buildPaginatedAttributes();
         $this->buildRelationAttributes();
         $this->buildDerivedAttributes();
 
