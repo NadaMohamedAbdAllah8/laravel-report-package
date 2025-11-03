@@ -1,0 +1,41 @@
+services:
+  mysql:
+    image: mysql:latest
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+      - MYSQL_DATABASE=employees_db
+      - MYSQL_ROOT_PASSWORD=
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  myapp:
+    image: bitnamilegacy/laravel:12.3.1
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_HOST=mysql        # service name
+      - DB_PORT=3306         # container port
+      - DB_USERNAME=root
+      - DB_DATABASE=employees_db
+      - DB_PASSWORD=
+    volumes:
+      - "./employees_db:/app"  # make sure this actually contains your Laravel project
+    depends_on:
+      - mysql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    environment:
+      - PMA_HOST=mysql
+      - PMA_PORT=3306
+      - PMA_USER=root
+      - PMA_PASSWORD=
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql
+
+volumes:
+  mysql_data:
