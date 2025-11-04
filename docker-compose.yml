@@ -6,7 +6,7 @@ services:
       - MYSQL_DATABASE=employees_db
       - MYSQL_ROOT_PASSWORD=
     ports:
-      - "3307:3306"
+      - "3307:3306" # as 3306 on the host machine will most likely be used by another application
     volumes:
       - mysql_data:/var/lib/mysql
 
@@ -21,7 +21,8 @@ services:
       - DB_DATABASE=employees_db
       - DB_PASSWORD=
     volumes:
-      - "./employees_db:/app"  # make sure this actually contains your Laravel project
+      - .:/var/www/html
+    working_dir: /var/www/html
     depends_on:
       - mysql
 
