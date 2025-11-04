@@ -1,0 +1,18 @@
+# ignore git stuff
+.git
+.gitignore
+
+# ignore local db folders
+employees_db
+storage/logs
+storage/framework/cache/*
+storage/framework/sessions/*
+
+# ignore dependencies (we'll install in container)
+vendor
+node_modules
+
+# ignore IDE stuff
+.idea
+.vscode
+*.log
