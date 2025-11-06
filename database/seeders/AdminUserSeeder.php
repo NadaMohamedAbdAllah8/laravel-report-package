@@ -12,7 +12,7 @@ class AdminUserSeeder extends Seeder
      */
     public function run(): void
     {
-        $email = 'admin@laravel_report_package.test';
+        $email = 'admin@reportpackage.test';
 
         User::firstOrCreate(
             ['email' => $email],
@@ -23,4 +23,3 @@ class AdminUserSeeder extends Seeder
         );
     }
 }
-
