@@ -36,7 +36,7 @@ class DepartmentController extends Controller
         $department = $this->departments->create($dto);
 
         return $this->returnItemWithSuccessMessage(
-            item: DepartmentResource::make($department),
+            item: new DepartmentResource($department),
             message: 'Department created'
         );
     }
@@ -44,7 +44,7 @@ class DepartmentController extends Controller
     public function show(Department $department): JsonResponse
     {
         return $this->returnItemWithSuccessMessage(
-            item: DepartmentResource::make($department),
+            item: new DepartmentResource($department),
             message: 'Department retrieved'
         );
     }
@@ -55,7 +55,7 @@ class DepartmentController extends Controller
         $department = $this->departments->update($department, $dto);
 
         return $this->returnItemWithSuccessMessage(
-            item: DepartmentResource::make($department),
+            item: new DepartmentResource($department),
             message: 'Department updated'
         );
     }

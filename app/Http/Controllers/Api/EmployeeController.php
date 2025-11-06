@@ -36,7 +36,7 @@ class EmployeeController extends Controller
         $employee = $this->employees->create($dto);
 
         return $this->returnItemWithSuccessMessage(
-            item: EmployeeResource::make($employee),
+            item: new EmployeeResource($employee),
             message: 'Employee created'
         );
     }
@@ -44,7 +44,7 @@ class EmployeeController extends Controller
     public function show(Employee $employee): JsonResponse
     {
         return $this->returnItemWithSuccessMessage(
-            item: EmployeeResource::make($employee),
+            item: new EmployeeResource($employee),
             message: 'Employee retrieved'
         );
     }
@@ -55,7 +55,7 @@ class EmployeeController extends Controller
         $employee = $this->employees->update(employee: $employee, data: $dto);
 
         return $this->returnItemWithSuccessMessage(
-            item: EmployeeResource::make($employee),
+            item: new EmployeeResource($employee),
             message: 'Employee updated'
         );
     }
