@@ -39,10 +39,10 @@ class AuthServiceTest extends TestCase
     {
         // arrange
         $email = $this->faker->safeEmail();
-        $plainPassword = $this->faker->password();
+        $password = $this->faker->password();
         $user = User::factory()->create([
             'email' => $email,
-            'password' => Hash::make($plainPassword),
+            'password' => Hash::make($password),
         ]);
 
         $this->userService->shouldReceive('getOneByEmail')
@@ -53,7 +53,7 @@ class AuthServiceTest extends TestCase
         // act
         $dto = LoginData::from([
             'email' => $email,
-            'password' => $plainPassword,
+            'password' => $password,
         ]);
 
         $response = $this->service->login($dto);
