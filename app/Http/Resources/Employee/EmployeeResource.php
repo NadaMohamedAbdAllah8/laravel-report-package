@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Employee;
 
+use App\Http\Resources\Department\DepartmentResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class EmployeeResource extends JsonResource
@@ -14,8 +15,8 @@ class EmployeeResource extends JsonResource
             'address' => $this->address,
             'phone' => $this->phone,
             'email' => $this->email,
-            'department_id' => $this->department_id,
-            'manager_id' => $this->manager_id,
+            'department' => new DepartmentResource($this->department),
+            'manager' => $this->manager ? new EmployeeSummaryResource($this->manager) : null,
             'salary' => $this->salary,
             'title' => $this->title,
         ];
