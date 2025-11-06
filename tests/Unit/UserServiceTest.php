@@ -4,13 +4,10 @@ namespace Tests\Unit;
 
 use App\Models\User;
 use App\Services\UserService;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class UserServiceTest extends TestCase
 {
-    use WithFaker;
-
     private UserService $service;
 
     protected function setUp(): void
