@@ -16,7 +16,6 @@ class AuthService
 
     public function login(LoginData $credentials): LoginResponseData
     {
-
         $user = $this->userService->getOneByEmail(email: $credentials->email);
 
         if (! $user || ! Hash::check($credentials->password, $user->password)) {
