@@ -19,12 +19,6 @@ class AuthServiceTest extends TestCase
 
     private UserService $userService;
 
-    protected function tearDown(): void
-    {
-        Mockery::close();
-        parent::tearDown();
-    }
-
     protected function setUp(): void
     {
         parent::setUp();
