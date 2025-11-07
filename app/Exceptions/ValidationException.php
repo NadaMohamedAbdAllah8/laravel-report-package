@@ -5,7 +5,6 @@ namespace App\Exceptions;
 use App\Traits\RespondsWithJson;
 use Exception;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response;
 
 class ValidationException extends Exception
 {
