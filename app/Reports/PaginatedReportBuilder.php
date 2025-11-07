@@ -9,19 +9,23 @@ use Illuminate\Support\Facades\Log;
 class PaginatedReportBuilder extends BaseReportBuilder
 {
     const CACHE_PREFIX = 'count_';
+
     const CACHE_TIME_IN_MINUTES = 30;
 
     const DEFAULT_PER_PAGE = 15;
+
     const DEFAULT_PAGE = 1;
 
-    private int $perPage;
+    private int $perPage = self::DEFAULT_PER_PAGE;
+
     private int $page = self::DEFAULT_PAGE;
+
     private array $pagination = [];
 
     /**
      * Set the number of items per page for pagination.
      */
-    public function paginate(int $perPage, ?int $page = self::DEFAULT_PAGE): self
+    public function paginate(int $perPage = self::DEFAULT_PER_PAGE, ?int $page = self::DEFAULT_PAGE): self
     {
         $this->perPage = $perPage;
         $this->page = $page;
@@ -43,7 +47,6 @@ class PaginatedReportBuilder extends BaseReportBuilder
         return $collection;
     }
 
-
     /**
      * Applies pagination to the query and stores pagination metadata.
      */
@@ -53,14 +56,14 @@ class PaginatedReportBuilder extends BaseReportBuilder
 
         $sqlQuery = $totalSizeQuery->toSql();
         $queryBindings = $totalSizeQuery->getBindings();
-        $cacheKey = self::CACHE_PREFIX . md5($sqlQuery . json_encode($queryBindings));
+        $cacheKey = self::CACHE_PREFIX.md5($sqlQuery.json_encode($queryBindings));
 
         $totalSize = Cache::remember(
             $cacheKey,
             now()->addMinutes(self::CACHE_TIME_IN_MINUTES),
             function () use ($totalSizeQuery): int {
-            return $totalSizeQuery->count('id');
-        });
+                return $totalSizeQuery->count('id');
+            });
 
         $totalPages = (int) ceil(($totalSize ?: 0) / max($this->perPage, 1));
 
