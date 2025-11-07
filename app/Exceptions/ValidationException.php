@@ -12,6 +12,6 @@ class ValidationException extends Exception
 
     public function render(): JsonResponse
     {
-        return $this->returnErrorMessage($this->getMessage(), $this->getCode());
+        return $this->returnErrorMessage($this->getMessage(), Response::HTTP_BAD_REQUEST);
     }
 }
