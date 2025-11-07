@@ -28,20 +28,17 @@ class EmployeeTest extends TestCase
                 'success',
                 'message',
                 'items' => [
-                    'data' => [
-                        [
-                            'id',
-                            'name',
-                            'address',
-                            'phone',
-                            'email',
-                            'salary',
-                            'title',
-                            'department' => ['id', 'name'],
-                        ],
+                    [
+                        'id',
+                        'name',
+                        'address',
+                        'phone',
+                        'email',
+                        'salary',
+                        'title',
+                        'department' => ['id', 'name'],
                     ],
-                    'links',
-                    'meta',
+
                 ],
                 'size',
                 'page',
@@ -116,6 +113,15 @@ class EmployeeTest extends TestCase
             ->assertJsonPath('item.name', $data['name'])
             ->assertJsonPath('item.email', $data['email'])
             ->assertJsonPath('item.department.id', $employee->department_id);
+    }
+
+    public function test_update_with_negative_id_returns_not_found(): void
+    {
+        // act
+        $response = $this->putJson($this->route.'-1');
+
+        // assert
+        $response->assertStatus(Response::HTTP_NOT_FOUND);
     }
 
     public function test_destroy_deletes_employee_and_returns_json(): void
