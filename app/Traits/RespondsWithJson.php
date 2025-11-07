@@ -15,12 +15,12 @@ trait RespondsWithJson
         ], $code);
     }
 
-    public function returnSuccessMessage($message = ''): HttpJsonResponse
+    public function returnSuccessMessage($message = '', $code = Response::HTTP_OK): HttpJsonResponse
     {
         return response()->json([
             'success' => true,
             'message' => $message,
-        ], Response::HTTP_OK);
+        ], $code);
     }
 
     public function returnItemWithSuccessMessage($item, $message): HttpJsonResponse
@@ -45,7 +45,7 @@ trait RespondsWithJson
     public function returnPaginatedData($item, $message, $resourcePath, $groupBy = null): HttpJsonResponse
     {
         $items = $resourcePath::collection($item);
-        
+
         if ($groupBy) {
             $items = $items->groupBy($groupBy);
         }

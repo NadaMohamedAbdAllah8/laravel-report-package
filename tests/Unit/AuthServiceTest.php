@@ -9,24 +9,15 @@ use App\Exceptions\ValidationException;
 use App\Models\User;
 use App\Services\AuthService;
 use App\Services\UserService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Hash;
 use Mockery;
 use Tests\TestCase;
 
 class AuthServiceTest extends TestCase
 {
-    use RefreshDatabase, WithFaker;
-
     private AuthService $service;
-    private UserService $userService;
 
-    protected function tearDown(): void
-    {
-        Mockery::close();
-        parent::tearDown();
-    }
+    private UserService $userService;
 
     protected function setUp(): void
     {
