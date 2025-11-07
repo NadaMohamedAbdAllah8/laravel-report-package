@@ -7,5 +7,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [AuthController::class, 'login']);
 
-Route::apiResource('employees', EmployeeController::class);
-Route::apiResource('departments', DepartmentController::class);
+Route::middleware('auth:api')->group(function () {
+    Route::apiResource('employees', EmployeeController::class);
+    Route::apiResource('departments', DepartmentController::class);
+});

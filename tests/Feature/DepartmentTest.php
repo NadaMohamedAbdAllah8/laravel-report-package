@@ -3,12 +3,20 @@
 namespace Tests\Feature;
 
 use App\Models\Department;
+use App\Models\User;
 use Illuminate\Http\Response;
 use Tests\TestCase;
 
 class DepartmentTest extends TestCase
 {
     private string $route = '/api/departments/';
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $user = User::factory()->create();
+        $this->actingAs($user, 'api');
+    }
 
     public function test_index_returns_paginated_departments(): void
     {

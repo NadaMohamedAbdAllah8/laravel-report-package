@@ -3,12 +3,20 @@
 namespace Tests\Feature;
 
 use App\Models\Employee;
+use App\Models\User;
 use Illuminate\Http\Response;
 use Tests\TestCase;
 
 class EmployeeTest extends TestCase
 {
     private string $route = '/api/employees/';
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $user = User::factory()->create();
+        $this->actingAs($user, 'api');
+    }
 
     public function test_index_returns_paginated_employees(): void
     {
