@@ -6,7 +6,7 @@ use App\Data\Department\DepartmentUpsertData;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Department\DepartmentResource;
 use App\Models\Department;
-use App\Services\DepartmentService;
+use App\Services\Departments\DepartmentService;
 use App\Traits\RespondsWithJson;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
