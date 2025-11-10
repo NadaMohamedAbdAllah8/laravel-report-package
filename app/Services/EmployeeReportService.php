@@ -8,7 +8,7 @@ use Illuminate\Support\Collection;
 
 class EmployeeReportService
 {
-    public function getReport(): Collection
+    public function getGeneraReport(array $filterData): Collection
     {
         return (new PaginatedReportBuilder(query: Employee::query()))
             ->attributes(attributes: ['id', 'name', 'email'])

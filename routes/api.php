@@ -3,7 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeController;
-use App\Http\Controllers\Api\EmployeeReportController;
+use App\Http\Controllers\Api\Employees\Reports\EmployeeGeneralReportController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [AuthController::class, 'login']);
@@ -13,6 +13,6 @@ Route::middleware('auth:api')->group(function () {
     Route::apiResource('departments', DepartmentController::class);
 
     Route::prefix('employees/report')->as('employees.report.')->group(function () {
-        Route::get('general', [EmployeeReportController::class, 'show']);
+        Route::get('general', EmployeeGeneralReportController::class);
     });
 });
