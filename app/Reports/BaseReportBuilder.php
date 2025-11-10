@@ -108,12 +108,12 @@ abstract class BaseReportBuilder
     public function get(): Collection
     {
         $finalCollection = collect([]);
-        $finalCollection['items'] = $this->getItems();
+        $finalCollection['data'] = $this->getItems();
         $finalCollection['expressionValues'] = $this->expressionsValues;
 
         Log::info(
             '[BaseReportBuilder] Successfully retrieved final collection',
-            ['record_count' => count($finalCollection['items'])]
+            ['record_count' => count($finalCollection['data'])]
         );
 
         return $finalCollection;
