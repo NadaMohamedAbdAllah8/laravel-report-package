@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Employees;
 
 use App\Models\Employee;
 use App\Reports\PaginatedReportBuilder;

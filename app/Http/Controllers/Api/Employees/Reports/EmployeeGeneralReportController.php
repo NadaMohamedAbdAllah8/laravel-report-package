@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\Employees\Reports;
 
 use App\Http\Controllers\Controller;
-use App\Services\EmployeeReportService;
+use App\Services\Employees\EmployeeReportService;
 use App\Traits\RespondsWithJson;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
