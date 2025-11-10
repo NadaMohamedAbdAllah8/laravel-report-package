@@ -3,7 +3,7 @@
 namespace App\Reports;
 
 use App\Exceptions\ValidationException;
-use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
@@ -13,12 +13,19 @@ use ReflectionFunctionAbstract;
 abstract class BaseReportBuilder
 {
     protected Builder $query;
+
     protected Collection $collection;
+
     protected array $attributes;
+
     protected array $relationsAttributes;
+
     protected array $derivedAttributes;
+
     protected array $expressions;
+
     protected array $expressionsValues;
+
     protected Collection $criteria;
 
     public function __construct($query)
@@ -59,6 +66,7 @@ abstract class BaseReportBuilder
     public function relationAttribute(string $key, string $relationAttribute): BaseReportBuilder
     {
         $this->relationsAttributes[$key] = $relationAttribute;
+
         return $this;
     }
 
@@ -69,16 +77,17 @@ abstract class BaseReportBuilder
      */
     public function derivedAttribute($key, $lambdaFunction): BaseReportBuilder
     {
-        if (!is_callable($lambdaFunction)) {
+        if (! is_callable($lambdaFunction)) {
             Log::error(
                 '[BaseReportBuilder] Invalid function provided for derived attribute',
                 [
-                    'key' => $key
+                    'key' => $key,
                 ]
             );
             throw new ValidationException('Not a valid function!');
         }
         $this->derivedAttributes[$key] = $lambdaFunction;
+
         return $this;
     }
 
@@ -87,10 +96,11 @@ abstract class BaseReportBuilder
         if (isset($fromDate) && isset($toDate)) {
             $this->query->whereBetween($column, [$fromDate, $toDate]);
         }
+
         return $this;
     }
 
-    abstract   public function build(): BaseReportBuilder;
+    abstract public function build(): BaseReportBuilder;
 
     /**
      * Gets the final result of the collection collection and expressions
@@ -98,12 +108,12 @@ abstract class BaseReportBuilder
     public function get(): Collection
     {
         $finalCollection = collect([]);
-        $finalCollection['items'] = $this->getItems();
+        $finalCollection['data'] = $this->getItems();
         $finalCollection['expressionValues'] = $this->expressionsValues;
 
         Log::info(
             '[BaseReportBuilder] Successfully retrieved final collection',
-            ['record_count' => count($finalCollection['items'])]
+            ['record_count' => count($finalCollection['data'])]
         );
 
         return $finalCollection;
@@ -131,6 +141,7 @@ abstract class BaseReportBuilder
             $paramNames = $this->getParametersNames($reflection);
             $this->buildDerivedAttribute(derivedAttribute: $derivedAttribute, paramNames: $paramNames, key: $key);
         }
+
         return $this;
     }
 
@@ -139,19 +150,21 @@ abstract class BaseReportBuilder
         foreach ($this->relationsAttributes as $key => $relationAttribute) {
             $this->buildRelationAttribute(key: $key, relationAttribute: $relationAttribute);
         }
+
         return $this;
     }
 
     protected function buildAttributes(): BaseReportBuilder
     {
         $this->collection = $this->query->get();
+
         return $this;
     }
 
-    protected function  applyCriteria(): BaseReportBuilder
+    protected function applyCriteria(): BaseReportBuilder
     {
         $this->criteria->each(function ($criteria): void {
-            $this->collection =  $criteria->apply($this->collection);
+            $this->collection = $criteria->apply($this->collection);
         });
 
         return $this;
@@ -178,9 +191,9 @@ abstract class BaseReportBuilder
 
     private function buildDerivedAttribute($derivedAttribute, $paramNames, $key): Collection
     {
-        return $this->query = $this->query
+        return $this->collection = $this->collection
             ->map(
-                function ($item) use ($derivedAttribute, $paramNames, $key): Collection {
+                function ($item) use ($derivedAttribute, $paramNames, $key): mixed {
                     return $this->applyDerivedAttribute(
                         collection: $item,
                         derivedAttribute: $derivedAttribute,
@@ -191,21 +204,25 @@ abstract class BaseReportBuilder
             );
     }
 
-    private function applyDerivedAttribute($collection, $derivedAttribute, $paramNames, $key): Collection
+    private function applyDerivedAttribute($collection, $derivedAttribute, $paramNames, $key): mixed
     {
         $args = [];
         foreach ($paramNames as $param) {
             $args[] = $collection->$param;
         }
         $collection->$key = $derivedAttribute(...$args);
+
         return $collection;
     }
 
     private function buildRelationAttribute($key, $relationAttribute): Collection
     {
-        return $this->query->map(
+        return $this->collection->map(
             function ($item) use ($key, $relationAttribute) {
-                return $item->$key = $this->getRelationAttribute($item, $relationAttribute);
+                return $item->$key = $this->getRelationAttribute(
+                    model: $item,
+                    relationAttribute: $relationAttribute
+                );
             }
         );
     }
@@ -222,7 +239,8 @@ abstract class BaseReportBuilder
     private function getItems(): Collection
     {
         $finalKeys = $this->getItemsKeys();
-        return $this->query->map(function ($item) use ($finalKeys): Collection {
+
+        return $this->collection->map(function ($item) use ($finalKeys) {
             return $item->only($finalKeys);
         });
     }

@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Unit\Departments;
 
 use App\Data\Department\DepartmentUpsertData;
 use App\Models\Department;
-use App\Services\DepartmentService;
+use App\Services\Departments\DepartmentService;
 use Tests\TestCase;
 
 class DepartmentServiceTest extends TestCase

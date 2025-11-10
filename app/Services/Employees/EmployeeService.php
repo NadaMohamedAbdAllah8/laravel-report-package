@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Employees;
 
 use App\Data\Employee\EmployeeUpsertData;
 use App\Models\Employee;

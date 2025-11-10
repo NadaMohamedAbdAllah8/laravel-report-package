@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Employees;
 
 use App\Data\Employee\EmployeeUpsertData;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Employee\EmployeeResource;
 use App\Models\Employee;
-use App\Services\EmployeeService;
+use App\Services\Employees\EmployeeService;
 use App\Traits\RespondsWithJson;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

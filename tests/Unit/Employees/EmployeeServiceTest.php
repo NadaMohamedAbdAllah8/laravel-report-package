@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Unit\Employees;
 
 use App\Data\Employee\EmployeeUpsertData;
 use App\Models\Department;
 use App\Models\Employee;
-use App\Services\EmployeeService;
+use App\Services\Employees\EmployeeService;
 use Tests\TestCase;
 
 class EmployeeServiceTest extends TestCase

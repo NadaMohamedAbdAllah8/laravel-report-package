@@ -51,7 +51,7 @@ class AuthTest extends TestCase
     {
         // arrange
         $password = $this->faker->password();
-        // no user with this email
+
         $wrongEmail = $this->faker->safeEmail();
 
         // act

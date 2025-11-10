@@ -32,6 +32,15 @@ trait RespondsWithJson
         ], Response::HTTP_OK);
     }
 
+    public function returnItemsWithSuccessMessage($items, $message): HttpJsonResponse
+    {
+        return response()->json([
+            'success' => true,
+            'message' => $message,
+            'items' => $items,
+        ], Response::HTTP_OK);
+    }
+
     public function returnItemWithErrorMessage($item, $message, $validationCode, $code): HttpJsonResponse
     {
         return response()->json([
