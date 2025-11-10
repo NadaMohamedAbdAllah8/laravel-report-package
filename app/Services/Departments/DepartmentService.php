@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Departments;
 
 use App\Data\Department\DepartmentUpsertData;
 use App\Models\Department;
