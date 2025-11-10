@@ -193,7 +193,7 @@ abstract class BaseReportBuilder
     {
         return $this->collection = $this->collection
             ->map(
-                function ($item) use ($derivedAttribute, $paramNames, $key): Collection {
+                function ($item) use ($derivedAttribute, $paramNames, $key): mixed {
                     return $this->applyDerivedAttribute(
                         collection: $item,
                         derivedAttribute: $derivedAttribute,
@@ -204,7 +204,7 @@ abstract class BaseReportBuilder
             );
     }
 
-    private function applyDerivedAttribute($collection, $derivedAttribute, $paramNames, $key): Collection
+    private function applyDerivedAttribute($collection, $derivedAttribute, $paramNames, $key): mixed
     {
         $args = [];
         foreach ($paramNames as $param) {
@@ -219,7 +219,10 @@ abstract class BaseReportBuilder
     {
         return $this->collection->map(
             function ($item) use ($key, $relationAttribute) {
-                return $item->$key = $this->getRelationAttribute($item, $relationAttribute);
+                return $item->$key = $this->getRelationAttribute(
+                    model: $item,
+                    relationAttribute: $relationAttribute
+                );
             }
         );
     }
