@@ -11,11 +11,8 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:api')->group(function () {
     Route::apiResource('departments', DepartmentController::class);
 
-    Route::prefix('employees')->group(function () {
-        Route::apiResource('employees', EmployeeController::class);
-
-        Route::prefix('report')->group(function () {
-            Route::get('general', EmployeeGeneralReportController::class);
-        });
+    Route::apiResource('employees', EmployeeController::class);
+    Route::prefix('employees/report')->as('employees.report.')->group(function () {
+        Route::get('general', EmployeeGeneralReportController::class);
     });
 });
