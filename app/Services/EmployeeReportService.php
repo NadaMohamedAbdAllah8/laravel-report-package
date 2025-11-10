@@ -11,9 +11,9 @@ class EmployeeReportService
     public function getReport(): Collection
     {
         return (new PaginatedReportBuilder(query: Employee::query()))
-            ->attributes(['id', 'name', 'email'])
-            ->relationAttribute('department', 'department.name')
-            ->relationAttribute('manager', 'manager.name')
+            ->attributes(attributes: ['id', 'name', 'email'])
+            ->relationAttribute(key: 'department', relationAttribute: 'department.name')
+            ->relationAttribute(key: 'manager', relationAttribute: 'manager.name')
             ->build()
             ->get();
     }
