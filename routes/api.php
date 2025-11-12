@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\DepartmentController;
+use App\Http\Controllers\Api\Departments\DepartmentController;
 use App\Http\Controllers\Api\Departments\Reports\DepartmentGeneralReportController;
 use App\Http\Controllers\Api\Employees\EmployeeController;
 use App\Http\Controllers\Api\Employees\Reports\EmployeeGeneralReportController;

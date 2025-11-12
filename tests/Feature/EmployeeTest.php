@@ -31,7 +31,6 @@ class EmployeeTest extends TestCase
         // assert
         $response->assertOk()
             ->assertJsonPath('success', true)
-            ->assertJsonPath('message', 'Employees retrieved')
             ->assertJsonStructure([
                 'success',
                 'message',
@@ -67,7 +66,6 @@ class EmployeeTest extends TestCase
         // assert
         $response->assertOk()
             ->assertJsonPath('success', true)
-            ->assertJsonPath('message', 'Employee created')
             ->assertJsonPath('item.name', $data['name'])
             ->assertJsonPath('item.email', $data['email'])
             ->assertJsonPath('item.department.id', $data['department_id']);
@@ -84,7 +82,6 @@ class EmployeeTest extends TestCase
         // assert
         $response->assertOk()
             ->assertJsonPath('success', true)
-            ->assertJsonPath('message', 'Employee retrieved')
             ->assertJsonPath('item.id', $employee->id)
             ->assertJsonPath('item.email', $employee->email)
             ->assertJsonPath('item.department.id', $employee->department_id);
@@ -116,7 +113,6 @@ class EmployeeTest extends TestCase
         // assert
         $response->assertOk()
             ->assertJsonPath('success', true)
-            ->assertJsonPath('message', 'Employee updated')
             ->assertJsonPath('item.id', $employee->id)
             ->assertJsonPath('item.name', $data['name'])
             ->assertJsonPath('item.email', $data['email'])

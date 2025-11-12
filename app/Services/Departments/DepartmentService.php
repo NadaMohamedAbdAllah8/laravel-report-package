@@ -3,14 +3,18 @@
 namespace App\Services\Departments;
 
 use App\Data\Department\DepartmentUpsertData;
+use App\Data\PaginationData;
 use App\Models\Department;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class DepartmentService
 {
-    public function paginate(int $perPage = 15): LengthAwarePaginator
+    public function paginate(PaginationData $data): LengthAwarePaginator
     {
-        return Department::query()->paginate($perPage);
+        return Department::query()->paginate(
+            perPage: $data->per_page,
+            page: $data->page
+        );
     }
 
     public function create(DepartmentUpsertData $data): Department

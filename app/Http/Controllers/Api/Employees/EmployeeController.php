@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Employees;
 
 use App\Data\Employee\EmployeeUpsertData;
+use App\Data\PaginationData;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Employee\EmployeeResource;
 use App\Models\Employee;
@@ -16,12 +17,12 @@ class EmployeeController extends Controller
 {
     use RespondsWithJson;
 
-    public function __construct(private EmployeeService $employees) {}
+    public function __construct(private EmployeeService $employeeService) {}
 
     public function index(Request $request): JsonResponse
     {
-        $perPage = (int) ($request->query('per_page', 15));
-        $paginator = $this->employees->paginate($perPage);
+        $dto = PaginationData::from($request->all());
+        $paginator = $this->employeeService->paginate(data: $dto);
 
         return $this->returnPaginatedData(
             item: $paginator,
@@ -33,7 +34,7 @@ class EmployeeController extends Controller
     public function store(Request $request): JsonResponse
     {
         $dto = EmployeeUpsertData::from($request->all());
-        $employee = $this->employees->create($dto);
+        $employee = $this->employeeService->create($dto);
 
         return $this->returnItemWithSuccessMessage(
             item: new EmployeeResource($employee),
@@ -52,7 +53,7 @@ class EmployeeController extends Controller
     public function update(Request $request, Employee $employee): JsonResponse
     {
         $dto = EmployeeUpsertData::from($request->all());
-        $employee = $this->employees->update(employee: $employee, data: $dto);
+        $employee = $this->employeeService->update(employee: $employee, data: $dto);
 
         return $this->returnItemWithSuccessMessage(
             item: new EmployeeResource($employee),
@@ -62,7 +63,7 @@ class EmployeeController extends Controller
 
     public function destroy(Employee $employee): JsonResponse
     {
-        $this->employees->delete(employee: $employee);
+        $this->employeeService->delete(employee: $employee);
 
         return $this->returnSuccessMessage(message: 'Employee deleted', code: Response::HTTP_NO_CONTENT);
     }
