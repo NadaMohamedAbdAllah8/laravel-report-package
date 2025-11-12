@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Departments;
 
 use App\Data\Department\DepartmentUpsertData;
 use App\Http\Controllers\Controller;
