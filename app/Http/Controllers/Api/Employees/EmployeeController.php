@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Employees;
 
 use App\Data\Employee\EmployeeUpsertData;
+use App\Data\PaginationData;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Employee\EmployeeResource;
 use App\Models\Employee;
@@ -20,8 +21,8 @@ class EmployeeController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $perPage = (int) ($request->query('per_page', 15));
-        $paginator = $this->employeeService->paginate($perPage);
+        $dto = PaginationData::from($request->all());
+        $paginator = $this->employeeService->paginate(data: $dto);
 
         return $this->returnPaginatedData(
             item: $paginator,

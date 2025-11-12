@@ -3,6 +3,7 @@
 namespace Tests\Unit\Employees;
 
 use App\Data\Employee\EmployeeUpsertData;
+use App\Data\PaginationData;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Services\Employees\EmployeeService;
@@ -84,7 +85,8 @@ class EmployeeServiceTest extends TestCase
         Employee::factory(3)->create();
 
         // act
-        $this->service->paginate(perPage: 2);
+        $paginationData = PaginationData::from();
+        $this->service->paginate(data: $paginationData);
 
         // assert
         $this->assertDatabaseCount(Employee::class, 3);

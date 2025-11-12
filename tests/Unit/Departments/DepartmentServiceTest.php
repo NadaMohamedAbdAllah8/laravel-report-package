@@ -3,6 +3,7 @@
 namespace Tests\Unit\Departments;
 
 use App\Data\Department\DepartmentUpsertData;
+use App\Data\PaginationData;
 use App\Models\Department;
 use App\Services\Departments\DepartmentService;
 use Tests\TestCase;
@@ -74,7 +75,8 @@ class DepartmentServiceTest extends TestCase
         Department::factory(3)->create();
 
         // act
-        $this->service->paginate(perPage: 2);
+        $paginationData = PaginationData::from();
+        $this->service->paginate(data: $paginationData);
 
         // assert
         $this->assertDatabaseCount(Department::class, 3);

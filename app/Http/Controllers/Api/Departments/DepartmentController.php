@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Departments;
 
 use App\Data\Department\DepartmentUpsertData;
+use App\Data\PaginationData;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Department\DepartmentResource;
 use App\Models\Department;
@@ -20,8 +21,8 @@ class DepartmentController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $perPage = (int) ($request->query('per_page', 15));
-        $paginator = $this->departmentService->paginate($perPage);
+        $dto = PaginationData::from($request->all());
+        $paginator = $this->departmentService->paginate(data: $dto);
 
         return $this->returnPaginatedData(
             item: $paginator,
