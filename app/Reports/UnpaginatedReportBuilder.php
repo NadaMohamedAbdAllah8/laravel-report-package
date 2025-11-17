@@ -8,11 +8,7 @@ use Illuminate\Support\Facades\Log;
 
 class UnpaginatedReportBuilder extends BaseReportBuilder
 {
-    protected $expressions;
-
-    protected $expressionsValues;
-
-    protected $sortCollectionAttributes;
+    protected array $sortCollectionAttributes = [];
 
     /**
      * Adds an expression that will be applied to the entire collection
@@ -21,7 +17,7 @@ class UnpaginatedReportBuilder extends BaseReportBuilder
      */
     public function expression($key, $lambda_function): BaseReportBuilder
     {
-        if (!is_callable($lambda_function)) {
+        if (! is_callable($lambda_function)) {
             Log::error('[ReportBuilder] Invalid function provided for expression', ['key' => $key]);
             throw new ValidationException('Not a valid function!');
         }
