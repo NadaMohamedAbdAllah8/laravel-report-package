@@ -5,7 +5,7 @@ arch()
     ->not->toUse(['die', 'dd', 'dump']);
 
 arch()
-    ->expect('App\\*\\Traits')
+    ->expect('App\\Traits')
     ->toBeTraits();
 
 arch()->preset()->php();
