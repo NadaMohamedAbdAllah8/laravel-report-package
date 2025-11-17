@@ -4,7 +4,6 @@ use App\Models\Department;
 use App\Models\User;
 use Illuminate\Http\Response;
 use Tests\TestCase;
-u
 
 uses(TestCase::class);
 
