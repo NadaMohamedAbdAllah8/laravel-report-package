@@ -1,84 +1,66 @@
 <?php
 
-namespace Tests\Feature;
-
 use App\Constants\AuthConstants;
 use App\Models\User;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
-class AuthTest extends TestCase
-{
-    use WithFaker;
+uses(TestCase::class, WithFaker::class);
 
-    private string $route = '/api/login';
+$loginRoute = '/api/login';
 
-    public function test_login_success_returns_expected_json(): void
-    {
-        // arrange
-        $password = $this->faker->password();
-        $user = User::factory()->create([
-            'password' => Hash::make($password),
-        ]);
+it('returns expected json on login success', function () use ($loginRoute): void {
+    $password = $this->faker->password();
+    $user = User::factory()->create([
+        'password' => Hash::make($password),
+    ]);
 
-        // act
-        $response = $this->postJson($this->route, [
-            'email' => $user->email,
-            'password' => $password,
-        ]);
+    $response = $this->postJson($loginRoute, [
+        'email' => $user->email,
+        'password' => $password,
+    ]);
 
-        // assert
-        $response->assertOk();
-        $response->assertJsonPath('success', true);
-        $response->assertJsonPath('message', 'Login successful');
-        $response->assertJsonPath('item.token_type', AuthConstants::TOKEN_TYPE);
-        $response->assertJsonPath('item.user.id', $user->id);
-        $response->assertJsonPath('item.user.name', $user->name);
-        $response->assertJsonPath('item.user.email', $user->email);
-        $response->assertJsonStructure([
-            'success',
-            'message',
-            'item' => [
-                'token',
-                'token_type',
-                'user' => ['id', 'name', 'email'],
-            ],
-        ]);
-    }
+    $response->assertOk();
+    $response->assertJsonPath('success', true);
+    $response->assertJsonPath('message', 'Login successful');
+    $response->assertJsonPath('item.token_type', AuthConstants::TOKEN_TYPE);
+    $response->assertJsonPath('item.user.id', $user->id);
+    $response->assertJsonPath('item.user.name', $user->name);
+    $response->assertJsonPath('item.user.email', $user->email);
+    $response->assertJsonStructure([
+        'success',
+        'message',
+        'item' => [
+            'token',
+            'token_type',
+            'user' => ['id', 'name', 'email'],
+        ],
+    ]);
+});
 
-    public function test_login_fails_with_wrong_email(): void
-    {
-        // arrange
-        $password = $this->faker->password();
+it('fails when email is incorrect', function () use ($loginRoute): void {
+    $password = $this->faker->password();
+    $wrongEmail = $this->faker->safeEmail();
 
-        $wrongEmail = $this->faker->safeEmail();
+    $response = $this->postJson($loginRoute, [
+        'email' => $wrongEmail,
+        'password' => $password,
+    ]);
 
-        // act
-        $response = $this->postJson($this->route, [
-            'email' => $wrongEmail,
-            'password' => $password,
-        ]);
+    $response->assertBadRequest();
+});
 
-        // assert
-        $response->assertBadRequest();
-    }
+it('fails when password is incorrect', function () use ($loginRoute): void {
+    $correctPassword = $this->faker->password();
+    $user = User::factory()->create([
+        'password' => Hash::make($correctPassword),
+    ]);
 
-    public function test_login_fails_with_wrong_password(): void
-    {
-        // arrange
-        $correctPassword = $this->faker->password();
-        $user = User::factory()->create([
-            'password' => Hash::make($correctPassword),
-        ]);
+    $response = $this->postJson($loginRoute, [
+        'email' => $user->email,
+        'password' => $this->faker->password(),
+    ]);
 
-        // act
-        $response = $this->postJson($this->route, [
-            'email' => $user->email,
-            'password' => $this->faker->password(),
-        ]);
-
-        // assert
-        $response->assertBadRequest();
-    }
-}
+    $response->assertBadRequest();
+});
