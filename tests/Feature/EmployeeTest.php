@@ -1,151 +1,116 @@
 <?php
 
-namespace Tests\Feature;
-
 use App\Models\Employee;
 use App\Models\User;
 use Illuminate\Http\Response;
 use Tests\TestCase;
 
-class EmployeeTest extends TestCase
-{
-    private string $route = '/api/employees/';
+uses(TestCase::class);
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $user = User::factory()->create();
-        $this->actingAs($user, 'api');
-    }
+beforeEach(function (): void {
+    $this->route = '/api/employees/';
+    $user = User::factory()->create();
+    $this->actingAs($user, 'api');
+});
 
-    public function test_index_returns_paginated_employees(): void
-    {
-        // arrange
-        $count = $this->faker->randomDigitNotZero();
-        Employee::factory($count)->create();
+test('index returns paginated employees', function (): void {
+    $count = $this->faker->randomDigitNotZero();
+    Employee::factory($count)->create();
 
-        // act
-        $perPage = $this->faker->randomDigitNotZero();
-        $response = $this->getJson($this->route.'?per_page='.$perPage);
+    $perPage = $this->faker->randomDigitNotZero();
+    $response = $this->getJson($this->route.'?per_page='.$perPage);
 
-        // assert
-        $response->assertOk()
-            ->assertJsonPath('success', true)
-            ->assertJsonStructure([
-                'success',
-                'message',
-                'items' => [
-                    [
-                        'id',
-                        'name',
-                        'address',
-                        'phone',
-                        'email',
-                        'salary',
-                        'title',
-                        'department' => ['id', 'name'],
-                    ],
-
+    $response->assertOk()
+        ->assertJsonPath('success', true)
+        ->assertJsonStructure([
+            'success',
+            'message',
+            'items' => [
+                [
+                    'id',
+                    'name',
+                    'address',
+                    'phone',
+                    'email',
+                    'salary',
+                    'title',
+                    'department' => ['id', 'name'],
                 ],
-                'size',
-                'page',
-                'total_pages',
-                'total_size',
-                'per_page',
-            ]);
-    }
 
-    public function test_store_creates_employee_and_returns_json(): void
-    {
-        // arrange
-        $data = Employee::factory()->make()->toArray();
+            ],
+            'size',
+            'page',
+            'total_pages',
+            'total_size',
+            'per_page',
+        ]);
+});
 
-        // act
-        $response = $this->postJson($this->route, $data);
+test('store creates employee and returns json', function (): void {
+    $data = Employee::factory()->make()->toArray();
 
-        // assert
-        $response->assertOk()
-            ->assertJsonPath('success', true)
-            ->assertJsonPath('item.name', $data['name'])
-            ->assertJsonPath('item.email', $data['email'])
-            ->assertJsonPath('item.department.id', $data['department_id']);
-    }
+    $response = $this->postJson($this->route, $data);
 
-    public function test_show_returns_employee_json(): void
-    {
-        // arrange
-        $employee = Employee::factory()->create();
+    $response->assertOk()
+        ->assertJsonPath('success', true)
+        ->assertJsonPath('item.name', $data['name'])
+        ->assertJsonPath('item.email', $data['email'])
+        ->assertJsonPath('item.department.id', $data['department_id']);
+});
 
-        // act
-        $response = $this->getJson($this->route.$employee->id);
+test('show returns employee json', function (): void {
+    $employee = Employee::factory()->create();
 
-        // assert
-        $response->assertOk()
-            ->assertJsonPath('success', true)
-            ->assertJsonPath('item.id', $employee->id)
-            ->assertJsonPath('item.email', $employee->email)
-            ->assertJsonPath('item.department.id', $employee->department_id);
-    }
+    $response = $this->getJson($this->route.$employee->id);
 
-    public function test_show_with_negative_id_returns_not_found(): void
-    {
-        // act
-        $response = $this->getJson($this->route.'-1');
+    $response->assertOk()
+        ->assertJsonPath('success', true)
+        ->assertJsonPath('item.id', $employee->id)
+        ->assertJsonPath('item.email', $employee->email)
+        ->assertJsonPath('item.department.id', $employee->department_id);
+});
 
-        // assert
-        $response->assertStatus(Response::HTTP_NOT_FOUND);
-    }
+test('show with negative id returns not found', function (): void {
+    $response = $this->getJson($this->route.'-1');
 
-    public function test_update_updates_employee_and_returns_json(): void
-    {
-        // arrange
-        $employee = Employee::factory()->create();
-        $updated = Employee::factory()->make();
+    $response->assertStatus(Response::HTTP_NOT_FOUND);
+});
 
-        $data = [
-            'name' => $updated->name,
-            'email' => $updated->email,
-        ];
+test('update updates employee and returns json', function (): void {
+    $employee = Employee::factory()->create();
+    $updated = Employee::factory()->make();
 
-        // act
-        $response = $this->putJson($this->route.$employee->id, $data);
+    $data = [
+        'name' => $updated->name,
+        'email' => $updated->email,
+    ];
 
-        // assert
-        $response->assertOk()
-            ->assertJsonPath('success', true)
-            ->assertJsonPath('item.id', $employee->id)
-            ->assertJsonPath('item.name', $data['name'])
-            ->assertJsonPath('item.email', $data['email'])
-            ->assertJsonPath('item.department.id', $employee->department_id);
-    }
+    $response = $this->putJson($this->route.$employee->id, $data);
 
-    public function test_update_with_negative_id_returns_not_found(): void
-    {
-        // act
-        $response = $this->putJson($this->route.'-1');
+    $response->assertOk()
+        ->assertJsonPath('success', true)
+        ->assertJsonPath('item.id', $employee->id)
+        ->assertJsonPath('item.name', $data['name'])
+        ->assertJsonPath('item.email', $data['email'])
+        ->assertJsonPath('item.department.id', $employee->department_id);
+});
 
-        // assert
-        $response->assertStatus(Response::HTTP_NOT_FOUND);
-    }
+test('update with negative id returns not found', function (): void {
+    $response = $this->putJson($this->route.'-1');
 
-    public function test_destroy_deletes_employee_and_returns_json(): void
-    {
-        // arrange
-        $employee = Employee::factory()->create();
+    $response->assertStatus(Response::HTTP_NOT_FOUND);
+});
 
-        // act
-        $response = $this->deleteJson($this->route.$employee->id);
+test('destroy deletes employee and returns json', function (): void {
+    $employee = Employee::factory()->create();
 
-        // assert
-        $response->assertStatus(Response::HTTP_NO_CONTENT);
-    }
+    $response = $this->deleteJson($this->route.$employee->id);
 
-    public function test_destroy_with_negative_id_returns_not_found(): void
-    {
-        // act
-        $response = $this->deleteJson($this->route.'-1');
+    $response->assertStatus(Response::HTTP_NO_CONTENT);
+});
 
-        // assert
-        $response->assertStatus(Response::HTTP_NOT_FOUND);
-    }
-}
+test('destroy with negative id returns not found', function (): void {
+    $response = $this->deleteJson($this->route.'-1');
+
+    $response->assertStatus(Response::HTTP_NOT_FOUND);
+});

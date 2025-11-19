@@ -1,84 +1,60 @@
 <?php
 
-namespace Tests\Unit\Departments;
-
 use App\Data\Department\DepartmentUpsertData;
 use App\Data\PaginationData;
 use App\Models\Department;
 use App\Services\Departments\DepartmentService;
 use Tests\TestCase;
 
-class DepartmentServiceTest extends TestCase
-{
-    private DepartmentService $service;
+uses(TestCase::class);
 
-    protected function setUp(): void
-    {
-        parent::setUp();
+beforeEach(function (): void {
+    $this->service = new DepartmentService;
+});
 
-        $this->service = new DepartmentService;
-    }
+test('create persists department', function (): void {
+    $data = Department::factory()->make();
+    $dto = DepartmentUpsertData::from($data->toArray());
 
-    public function test_create_persists_department(): void
-    {
-        // arrange
-        $data = Department::factory()->make();
-        $dto = DepartmentUpsertData::from($data->toArray());
+    $department = $this->service->create(data: $dto);
 
-        // act
-        $department = $this->service->create(data: $dto);
+    $this->assertDatabaseHas(Department::class, [
+        'id' => $department->id,
+        'name' => $dto->name,
+    ]);
+});
 
-        // assert
-        $this->assertDatabaseHas(Department::class, [
-            'id' => $department->id,
-            'name' => $dto->name,
-        ]);
-    }
+test('update updates department name', function (): void {
+    $department = Department::factory()->create();
 
-    public function test_update_updates_department_name(): void
-    {
-        // arrange
-        $department = Department::factory()->create();
+    $data = Department::factory()->make();
+    $dto = DepartmentUpsertData::from([
+        'name' => $data->name,
+    ]);
 
-        $data = Department::factory()->make();
-        $dto = DepartmentUpsertData::from([
-            'name' => $data->name,
-        ]);
+    $this->service->update(department: $department, data: $dto);
 
-        // act
-        $this->service->update(department: $department, data: $dto);
+    $this->assertDatabaseHas(Department::class, [
+        'id' => $department->id,
+        'name' => $dto->name,
+    ]);
+});
 
-        // assert
-        $this->assertDatabaseHas(Department::class, [
-            'id' => $department->id,
-            'name' => $dto->name,
-        ]);
-    }
+test('delete soft deletes department', function (): void {
+    $department = Department::factory()->create();
 
-    public function test_delete_soft_deletes_department(): void
-    {
-        // arrange
-        $department = Department::factory()->create();
+    $this->service->delete($department);
 
-        // act
-        $this->service->delete($department);
+    $this->assertSoftDeleted(Department::class, [
+        'id' => $department->id,
+    ]);
+});
 
-        // assert
-        $this->assertSoftDeleted(Department::class, [
-            'id' => $department->id,
-        ]);
-    }
+test('paginate after creations reflects db state', function (): void {
+    Department::factory(3)->create();
 
-    public function test_paginate_after_creations_reflects_db_state(): void
-    {
-        // arrange
-        Department::factory(3)->create();
+    $paginationData = PaginationData::from();
+    $this->service->paginate(data: $paginationData);
 
-        // act
-        $paginationData = PaginationData::from();
-        $this->service->paginate(data: $paginationData);
-
-        // assert
-        $this->assertDatabaseCount(Department::class, 3);
-    }
-}
+    $this->assertDatabaseCount(Department::class, 3);
+});
