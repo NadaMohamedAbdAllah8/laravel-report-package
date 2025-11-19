@@ -1,49 +1,34 @@
 <?php
 
-namespace Tests\Unit;
-
 use App\Models\User;
 use App\Services\UserService;
 use Tests\TestCase;
 
-class UserServiceTest extends TestCase
-{
-    private UserService $service;
+uses(TestCase::class);
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->service = new UserService;
-    }
+beforeEach(function (): void {
+    $this->service = new UserService;
+});
 
-    public function test_get_one_by_email_returns_user_when_user(): void
-    {
-        // arrange
-        $email = $this->faker->safeEmail();
-        $fakedUser = User::factory()->create(['email' => $email]);
+test('getOneByEmail returns user when user exists', function (): void {
+    $email = $this->faker->safeEmail();
+    $fakedUser = User::factory()->create(['email' => $email]);
 
-        // act
-        $user = $this->service->getOneByEmail($email);
+    $user = $this->service->getOneByEmail($email);
 
-        // assert
-        $this->assertNotNull($user);
-        $this->assertInstanceOf(User::class, $user);
-        $this->assertSame($fakedUser->id, $user->id);
-        $this->assertSame($email, $user->email);
-    }
+    expect($user)->not->toBeNull();
+    expect($user)->toBeInstanceOf(User::class);
+    expect($user?->id)->toBe($fakedUser->id);
+    expect($user?->email)->toBe($email);
+});
 
-    public function test_get_one_by_email_returns_null_when_not_user(): void
-    {
-        // arrange
-        $userEmail = $this->faker->safeEmail();
-        $randomEmail = $this->faker->safeEmail();
+test('getOneByEmail returns null when user does not exist', function (): void {
+    $userEmail = $this->faker->safeEmail();
+    $randomEmail = $this->faker->safeEmail();
 
-        $fakedUser = User::factory()->create(['email' => $userEmail]);
+    User::factory()->create(['email' => $userEmail]);
 
-        // act
-        $user = $this->service->getOneByEmail($randomEmail);
+    $user = $this->service->getOneByEmail($randomEmail);
 
-        // assert
-        $this->assertNull($user);
-    }
-}
+    expect($user)->toBeNull();
+});
