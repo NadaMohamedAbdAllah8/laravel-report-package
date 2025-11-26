@@ -16,14 +16,14 @@ beforeEach(function (): void {
 test('general report returns expected structure and data', function (): void {
     $department = Department::factory()->create();
     $manager = Employee::factory()
-        ->forDepartment($department)
+        ->for($department)
         ->create([
             'title' => 'Manager',
             'manager_id' => null,
         ]);
 
     $employees = Employee::factory(2)
-        ->forDepartment($department)
+        ->for($department)
         ->state([
             'manager_id' => $manager->id,
         ])
