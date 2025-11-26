@@ -30,34 +30,10 @@ class EmployeeFactory extends Factory
             'address' => $this->faker->address(),
             'phone' => $this->faker->phoneNumber(),
             'email' => $this->faker->unique()->safeEmail(),
-            'department_id' => Department::factory()->create()->id,
+            'department_id' => Department::factory(),
             'manager_id' => null,
             'salary' => $this->faker->randomFloat(2, 30000, 200000),
             'title' => $this->faker->jobTitle(),
         ];
-    }
-
-    /**
-     * Assign a manager to the employee.
-     */
-    public function withManager(): static
-    {
-        return $this->state(function (array $attributes) {
-            return [
-                'manager_id' => Employee::factory()->state([
-                    'department_id' => $attributes['department_id'] ?? Department::factory()->create()->id,
-                ]),
-            ];
-        });
-    }
-
-    /**
-     * Put the employee in a specific department.
-     */
-    public function forDepartment(Department $department): static
-    {
-        return $this->state(fn(array $attributes) => [
-            'department_id' => $department->id,
-        ]);
     }
 }
