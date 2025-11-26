@@ -8,35 +8,42 @@ use Illuminate\Database\Seeder;
 
 class DepartmentEmployeeSeeder extends Seeder
 {
-    /**
-     * Seed 4 departments with employees and a manager each.
-     */
     public function run(): void
     {
-        if (Department::count() > 0 || Employee::count() > 0) {
+        $departmentCount = 20;
+        $minEmployeesPerDepartment = 2000;
+        $maxEmployeesPerDepartment = 5000;
+
+        if (Department::count() >= $departmentCount || Employee::count() > $minEmployeesPerDepartment * $departmentCount) {
             return;
         }
 
-        $sizes = [20, 50, 30, 15];
+        $departments = Department::factory($departmentCount)
+            ->create()
+            ->each(function (Department $department) use ($minEmployeesPerDepartment, $maxEmployeesPerDepartment) {
+                $employeesCount = fake()->numberBetween(
+                    $minEmployeesPerDepartment,
+                    $maxEmployeesPerDepartment
+                );
 
-        foreach ($sizes as $size) {
-            $department = Department::factory()->create();
-
-            $manager = Employee::factory()
-                ->for($department)
-                ->create([
-                    'title' => 'Manager',
-                    'manager_id' => null,
-                ]);
-
-            if ($size > 1) {
-                $employees = Employee::factory($size - 1)
+                // 1) Create manager
+                $manager = Employee::factory()
                     ->for($department)
-                    ->state([
-                        'manager_id' => $manager->id,
-                    ])
-                    ->create();
-            }
-        }
+                    ->create([
+                        'department_id' => $department->id,
+                        'title' => 'Manager',
+                        'manager_id' => null,
+                    ]);
+
+                // 2) Create the rest of the employees
+                if ($employeesCount > 1) {
+                    $employees = Employee::factory($employeesCount - 1)
+                        ->for($department)
+                        ->create([
+                            'department_id' => $department->id,
+                            'manager_id' => $manager->id,
+                        ]);
+                }
+            });
     }
 }
