@@ -8,7 +8,7 @@ use App\Traits\RespondsWithJson;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class DepartmentGeneralReportController extends Controller
+class DepartmentSalariesReportController extends Controller
 {
     use RespondsWithJson;
 
@@ -16,7 +16,7 @@ class DepartmentGeneralReportController extends Controller
 
     public function __invoke(Request $request): JsonResponse
     {
-        $data = $this->reports->getGeneralReport(filterData: $request->all());
+        $data = $this->reports->getSalariesReport(filterData: $request->all());
 
         return $this->returnItemsWithSuccessMessage(
             items: $data,
