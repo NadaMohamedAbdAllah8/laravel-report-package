@@ -16,7 +16,7 @@ class DepartmentGeneralReportController extends Controller
 
     public function __invoke(Request $request): JsonResponse
     {
-        $data = $this->reports->getGeneraReport(filterData: $request->all());
+        $data = $this->reports->getGeneralReport(filterData: $request->all());
 
         return $this->returnItemsWithSuccessMessage(
             items: $data,

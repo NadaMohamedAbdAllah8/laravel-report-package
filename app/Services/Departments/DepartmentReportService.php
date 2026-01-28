@@ -9,7 +9,7 @@ use Illuminate\Support\Collection;
 
 class DepartmentReportService
 {
-    public function getGeneraReport(array $filterData): Collection
+    public function getGeneralReport(array $filterData): Collection
     {
         $employeesCount = function ($employees): int {
             return $employees->count();
