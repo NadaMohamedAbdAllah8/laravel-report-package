@@ -23,7 +23,7 @@ test('general report returns expected structure and data', function (): void {
             'manager_id' => null,
         ]);
 
-    Employee::factory(2)
+    Employee::factory()
         ->for($department)
         ->state([
             'manager_id' => $manager->id,

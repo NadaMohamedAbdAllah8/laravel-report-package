@@ -1,26 +1,18 @@
 <?php
 
-namespace App\Reports\Criteria\Order;
+namespace Nada\ReportBuilder\Reports\Criteria\Order;
 
-use App\Enums\SortingType;
-use App\Exceptions\ValidationException;
 use Illuminate\Database\Eloquent\Builder;
+use Nada\ReportBuilder\Reports\BaseReportBuilder;
+use Nada\ReportBuilder\Validators\Reports\ReportBuilderValidator;
 
-use App\Reports\Criteria\Criteria;
-use App\Validators\Reports\ReportBuilderValidator;
-
-class OrderByRelatedColumn implements Criteria
+class OrderByRelatedColumn implements OrderCriteria
 {
-    protected string $relation;
-    protected string $column;
-    protected string $direction;
-
-    public function __construct(string $relation, string $column, string $direction = SortingType::ASC->value)
-    {
-        $this->relation = $relation;
-        $this->column = $column;
-        $this->direction = $direction;
-    }
+    public function __construct(
+        protected string $relation,
+        protected string $column,
+        protected string $direction = BaseReportBuilder::SORT_ASC
+    ) {}
 
     public function apply(Builder $query): Builder
     {

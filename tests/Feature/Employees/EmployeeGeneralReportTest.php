@@ -8,7 +8,7 @@ use Tests\TestCase;
 uses(TestCase::class);
 
 beforeEach(function (): void {
-    $this->route = '/api/employees/report/general';
+    $this->route = '/api/employees/report/general?per_page=100';
     $user = User::factory()->create();
     $this->actingAs($user, 'api');
 });
@@ -51,11 +51,9 @@ test('general report returns expected structure and data', function (): void {
     $payload = $response->json('items.data');
     expect($payload)->not()->toBeEmpty();
 
-    $byId = collect($payload)->keyBy('id');
-
     foreach ($all as $emp) {
-        expect($byId)->toHaveKey((string) $emp->id);
-        $row = $byId[$emp->id];
+        $row = collect($payload)->firstWhere('id', $emp->id);
+        expect($row)->not()->toBeNull();
         expect($row['name'])->toBe($emp->name);
         expect($row['email'])->toBe($emp->email);
         expect($row['department'])->toBe($department->name);

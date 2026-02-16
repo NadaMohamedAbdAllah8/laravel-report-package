@@ -1,17 +1,22 @@
 <?php
 
-namespace App\Reports;
+namespace Nada\ReportBuilder\Reports;
 
-use App\Exceptions\ValidationException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use Nada\ReportBuilder\Exceptions\ReportBuilderException;
 use ReflectionFunction;
 use ReflectionFunctionAbstract;
+use ReflectionParameter;
 
 abstract class BaseReportBuilder
 {
+    public const SORT_ASC = 'asc';
+
+    public const SORT_DESC = 'desc';
+
     protected Builder $query;
 
     protected Collection $collection;
@@ -28,7 +33,7 @@ abstract class BaseReportBuilder
 
     protected Collection $criteria;
 
-    public function __construct($query)
+    public function __construct(Builder $query)
     {
         $this->query = $query;
         $this->attributes = [];
@@ -75,7 +80,7 @@ abstract class BaseReportBuilder
      *
      * @throws ValidationException
      */
-    public function derivedAttribute($key, $lambdaFunction): BaseReportBuilder
+    public function derivedAttribute(string $key, callable $lambdaFunction): BaseReportBuilder
     {
         if (! is_callable($lambdaFunction)) {
             Log::error(
@@ -84,16 +89,16 @@ abstract class BaseReportBuilder
                     'key' => $key,
                 ]
             );
-            throw new ValidationException('Not a valid function!');
+            throw new ReportBuilderException('Not a valid function!');
         }
         $this->derivedAttributes[$key] = $lambdaFunction;
 
         return $this;
     }
 
-    public function filterBetween(string $column, string $fromDate, string $toDate): BaseReportBuilder
+    public function filterBetween(string $column, ?string $fromDate, ?string $toDate): BaseReportBuilder
     {
-        if (isset($fromDate) && isset($toDate)) {
+        if ($fromDate !== null && $toDate !== null) {
             $this->query->whereBetween($column, [$fromDate, $toDate]);
         }
 
@@ -119,7 +124,7 @@ abstract class BaseReportBuilder
         return $finalCollection;
     }
 
-    protected function getReflection($function): ReflectionFunctionAbstract
+    protected function getReflection(callable $function): ReflectionFunctionAbstract
     {
         return new ReflectionFunction($function);
     }
@@ -127,7 +132,7 @@ abstract class BaseReportBuilder
     protected function getParametersNames(ReflectionFunctionAbstract $reflection): array
     {
         return array_map(
-            function ($param) {
+            function (ReflectionParameter $param): string {
                 return $param->getName();
             },
             $reflection->getParameters()
@@ -170,7 +175,7 @@ abstract class BaseReportBuilder
         return $this;
     }
 
-    private function getRelationAttribute($model, $relationAttribute): mixed
+    private function getRelationAttribute(object $model, string $relationAttribute): mixed
     {
         $lastDotPosition = strrpos($relationAttribute, '.');
         $relationName = substr($relationAttribute, 0, $lastDotPosition);
@@ -189,11 +194,11 @@ abstract class BaseReportBuilder
         return $model->$attribute;
     }
 
-    private function buildDerivedAttribute($derivedAttribute, $paramNames, $key): Collection
+    private function buildDerivedAttribute(callable $derivedAttribute, array $paramNames, string $key): Collection
     {
         return $this->collection = $this->collection
             ->map(
-                function ($item) use ($derivedAttribute, $paramNames, $key): mixed {
+                function (object $item) use ($derivedAttribute, $paramNames, $key): object {
                     return $this->applyDerivedAttribute(
                         collection: $item,
                         derivedAttribute: $derivedAttribute,
@@ -204,7 +209,7 @@ abstract class BaseReportBuilder
             );
     }
 
-    private function applyDerivedAttribute($collection, $derivedAttribute, $paramNames, $key): mixed
+    private function applyDerivedAttribute(object $collection, callable $derivedAttribute, array $paramNames, string $key): object
     {
         $args = [];
         foreach ($paramNames as $param) {
@@ -215,10 +220,10 @@ abstract class BaseReportBuilder
         return $collection;
     }
 
-    private function buildRelationAttribute($key, $relationAttribute): Collection
+    private function buildRelationAttribute(string $key, string $relationAttribute): Collection
     {
         return $this->collection->map(
-            function ($item) use ($key, $relationAttribute) {
+            function (object $item) use ($key, $relationAttribute): mixed {
                 return $item->$key = $this->getRelationAttribute(
                     model: $item,
                     relationAttribute: $relationAttribute
@@ -240,7 +245,7 @@ abstract class BaseReportBuilder
     {
         $finalKeys = $this->getItemsKeys();
 
-        return $this->collection->map(function ($item) use ($finalKeys) {
+        return $this->collection->map(function (object $item) use ($finalKeys): mixed {
             return $item->only($finalKeys);
         });
     }

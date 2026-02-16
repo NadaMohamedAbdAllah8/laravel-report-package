@@ -5,7 +5,17 @@
     "description": "The skeleton application for the Laravel framework.",
     "keywords": ["laravel", "framework"],
     "license": "MIT",
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/report-builder",
+            "options": {
+                "symlink": false
+            }
+        }
+    ],
     "require": {
+        "nada/report-builder": "*",
         "php": "^8.2",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",

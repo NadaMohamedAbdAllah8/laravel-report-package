@@ -3,9 +3,9 @@
 namespace App\Services\Departments;
 
 use App\Models\Department;
-use App\Reports\PaginatedReportBuilder;
 use App\Services\Departments\Dto\DepartmentEmployeeData;
 use Illuminate\Support\Collection;
+use Nada\ReportBuilder\Reports\PaginatedReportBuilder;
 
 class DepartmentReportService
 {

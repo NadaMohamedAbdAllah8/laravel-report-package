@@ -1,5 +1,6 @@
 <?php
-namespace App\Reports\Criteria;
+
+namespace Nada\ReportBuilder\Reports\Criteria;
 
 use Illuminate\Database\Eloquent\Builder;
 

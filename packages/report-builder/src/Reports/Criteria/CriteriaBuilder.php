@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Reports\Criteria;
+namespace Nada\ReportBuilder\Reports\Criteria;
 
-use App\Reports\Criteria\Order\OrderCriteria;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Nada\ReportBuilder\Reports\Criteria\Order\OrderCriteria;
 
 class CriteriaBuilder
 {
@@ -17,16 +17,18 @@ class CriteriaBuilder
         $this->filters = collect([]);
         $this->order = collect([]);
     }
-    
+
     public function where(string $field, string $operator, mixed $value): self
     {
         $this->filters->push(compact('field', 'operator', 'value'));
+
         return $this;
     }
 
     public function order(OrderCriteria $order): self
     {
         $this->order->push($order);
+
         return $this;
     }
 
@@ -41,13 +43,12 @@ class CriteriaBuilder
     private function applyFilters(Builder $query): void
     {
         $this->filters->each(
-            fn($filter): Builder =>
-            $query->where($filter['field'], $filter['operator'], $filter['value'])
+            fn (array $filter): Builder => $query->where($filter['field'], $filter['operator'], $filter['value'])
         );
     }
 
     private function applyOrders(Builder $query): void
     {
-        $this->order->each(fn($order): Builder => $order->apply($query));
+        $this->order->each(fn (OrderCriteria $order): Builder => $order->apply($query));
     }
 }

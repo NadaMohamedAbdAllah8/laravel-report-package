@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Reports;
+namespace Nada\ReportBuilder\Reports;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -8,13 +8,13 @@ use Illuminate\Support\Facades\Log;
 
 class PaginatedReportBuilder extends BaseReportBuilder
 {
-    const CACHE_PREFIX = 'count_';
+    public const CACHE_PREFIX = 'count_';
 
-    const CACHE_TIME_IN_MINUTES = 30;
+    public const CACHE_TIME_IN_MINUTES = 30;
 
-    const DEFAULT_PER_PAGE = 15;
+    public const DEFAULT_PER_PAGE = 15;
 
-    const DEFAULT_PAGE = 1;
+    public const DEFAULT_PAGE = 1;
 
     private int $perPage = self::DEFAULT_PER_PAGE;
 

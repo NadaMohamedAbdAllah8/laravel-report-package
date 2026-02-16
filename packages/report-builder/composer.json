@@ -1,0 +1,16 @@
+{
+  "name": "nada/report-builder",
+  "version": "1.0.0",
+  "type": "library",
+  "license": "proprietary",
+  "require": {
+    "php": "^8.2",
+    "illuminate/database": "^12.0",
+    "illuminate/support": "^12.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Nada\\ReportBuilder\\": "src/"
+    }
+  }
+}

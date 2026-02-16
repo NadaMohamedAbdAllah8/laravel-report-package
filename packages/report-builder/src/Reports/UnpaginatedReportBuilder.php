@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Reports;
+namespace Nada\ReportBuilder\Reports;
 
-use App\Exceptions\ValidationException;
-use App\Validators\Reports\ReportBuilderValidator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use Nada\ReportBuilder\Exceptions\ReportBuilderException;
+use Nada\ReportBuilder\Validators\Reports\ReportBuilderValidator;
 
 class UnpaginatedReportBuilder extends BaseReportBuilder
 {
@@ -15,32 +16,32 @@ class UnpaginatedReportBuilder extends BaseReportBuilder
      *
      * @throws ValidationException
      */
-    public function expression($key, $lambda_function): BaseReportBuilder
+    public function expression(string $key, callable $lambdaFunction): BaseReportBuilder
     {
-        if (! is_callable($lambda_function)) {
+        if (! is_callable($lambdaFunction)) {
             Log::error('[ReportBuilder] Invalid function provided for expression', ['key' => $key]);
-            throw new ValidationException('Not a valid function!');
+            throw new ReportBuilderException('Not a valid function!');
         }
 
-        $this->expressions[$key] = $lambda_function;
+        $this->expressions[$key] = $lambdaFunction;
 
         return $this;
     }
 
-    private function applyExpression($item, $carry, $expression, $param_names): mixed
+    private function applyExpression(object $item, mixed $carry, callable $expression, array $paramNames): mixed
     {
         $args = [];
-        foreach ($param_names as $param) {
+        foreach ($paramNames as $param) {
             $args[] = $item->$param;
         }
 
         return $carry + $expression(...$args);
     }
 
-    private function buildExpression($collection, $expression, $param_names)
+    private function buildExpression(Collection $collection, callable $expression, array $paramNames): mixed
     {
-        return $collection->reduce(function ($carry, $item) use ($expression, $param_names) {
-            return $this->applyExpression($item, $carry, $expression, $param_names);
+        return $collection->reduce(function (mixed $carry, object $item) use ($expression, $paramNames): mixed {
+            return $this->applyExpression($item, $carry, $expression, $paramNames);
         });
     }
 
@@ -48,12 +49,12 @@ class UnpaginatedReportBuilder extends BaseReportBuilder
     {
         foreach ($this->expressions as $key => $expression) {
             $reflection = $this->getReflection($expression);
-            $param_names = $this->getParametersNames($reflection);
+            $paramNames = $this->getParametersNames($reflection);
 
             $collection = $this->collection;
-            $expression_value = $this->buildExpression(collection: $collection, expression: $expression, param_names: $param_names);
+            $expressionValue = $this->buildExpression(collection: $collection, expression: $expression, paramNames: $paramNames);
 
-            $this->expressionsValues[$key] = $expression_value;
+            $this->expressionsValues[$key] = $expressionValue;
         }
 
         return $this;
